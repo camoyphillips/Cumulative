@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Cumulative.Models.Course>
+
+@{
+    ViewData["Title"] = "Course List";
+}
+
+<h2>Course List</h2>
+
+<form method="get" action="@Url.Action("Index", "CoursePage")">
+    <input type="text" name="SearchKey" placeholder="Search by name" value="@Context.Request.Query["SearchKey"]" />
+    <button type="submit">Search</button>
+</form>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Start Date</th>
+            <th>Finish Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.CourseID</td>
+                <td>@course.CourseCode</td>
+                <td>@course.CourseName</td>
+                <td>@course.StartDate.ToString("yyyy-MM-dd")</td>
+                <td>@course.FinishDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a href="@Url.Action("Details", "CoursePage", new { id = course.CourseID })">Details</a> |
+                    <a href="@Url.Action("Edit", "CoursePage", new { id = course.CourseID })">Edit</a> |
+                    <a href="@Url.Action("Delete", "CoursePage", new { id = course.CourseID })">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create", "CoursePage")">Add New Course</a>

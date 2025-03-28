@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>School Management System</p>
+</div>
+
+<!-- Search Bar Section -->
+<div class="text-center mt-4">
+    <form asp-controller="Home" asp-action="Search" method="get" class="form-inline justify-content-center">
+        <div class="form-group mb-2">
+            <input type="text" name="query" class="form-control" placeholder="Search..." />
+        </div>
+        <button type="submit" class="btn btn-primary mb-2 ml-2">Search</button>
+    </form>
+</div>
