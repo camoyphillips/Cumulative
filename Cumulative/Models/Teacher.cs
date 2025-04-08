@@ -1,27 +1,42 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Cumulative.Models
 {
-    public class Teacher(int teacherID, string firstName, string lastName, string employeeNumber, DateTime? hireDate, decimal salary)
+    public class Teacher
     {
         [Key]
-        public int TeacherID { get; set; } = teacherID;
+        public int teacherid { get; set; }
 
         [Required]
-        public string FirstName { get; set; } = firstName;
+        public string? teacherfname { get; set; }
 
         [Required]
-        public string LastName { get; set; } = lastName;
+        public string? teacherlname { get; set; }
 
         [Required]
-        public string EmployeeNumber { get; set; } = employeeNumber;
+        public string? employeenumber { get; set; }
 
-        public DateTime? HireDate { get; set; } = hireDate;
+        public DateTime? hiredate { get; set; }
 
-        public decimal Salary { get; set; } = salary;
+        public decimal salary { get; set; }
 
-        // Many-to-Many Relationship with Courses
-        public ICollection<TeacherCourse> TeacherCourses { get; set; } = new List<TeacherCourse>();
+        public string? teacherworkphone { get; set; }
+
+        public ICollection<StudentCourse> TeacherCourses { get; set; } = new List<StudentCourse>();
+
+        public Teacher() { }
+
+        public Teacher(int TeacherID, string FirstName, string LastName, string EmployeeNumber, DateTime? HireDate, decimal Salary)
+        {
+            teacherid = TeacherID;
+            teacherfname = FirstName;
+            teacherlname = LastName;
+            employeenumber = EmployeeNumber;
+            hiredate = HireDate;
+            salary = Salary;
+            teacherworkphone = teacherworkphone;
+    }
     }
 }

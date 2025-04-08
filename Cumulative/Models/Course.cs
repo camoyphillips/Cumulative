@@ -4,24 +4,36 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cumulative.Models
 {
-    public class Course(int courseID, string courseCode, string courseName, int teacherID, DateTime startDate, DateTime finishDate)
+    public class Course
     {
         [Key]
-        public int CourseID { get; set; } = courseID;
+        public int courseid { get; set; }
 
         [Required]
-        public string CourseCode { get; set; } = courseCode;
+        public string? coursecode { get; set; }
 
         [Required]
-        public string CourseName { get; set; } = courseName;
+        public string? coursename { get; set; }
 
-        public int TeacherID { get; set; } = teacherID;
+        public int teacherid { get; set; }
 
-        public DateTime StartDate { get; set; } = startDate;
+        public DateTime startdate { get; set; }
 
-        public DateTime FinishDate { get; set; } = finishDate;
+        public DateTime finishdate { get; set; }
 
-        // Many-to-Many Relationship with Teachers
-        public ICollection<TeacherCourse> TeacherCourses { get; set; } = new List<TeacherCourse>();
+        // ✅ Navigation property for many-to-many
+        public ICollection<StudentCourse> StudentCourses { get; set; } = new List<StudentCourse>();
+
+        public Course() { }
+
+        public Course(int CourseID, string CourseCode, string CourseName, int TeacherID, DateTime StartDate, DateTime FinishDate)
+        {
+            courseid = CourseID;
+            coursecode = CourseCode;
+            coursename = CourseName;
+            teacherid = TeacherID;
+            startdate = StartDate;
+            finishdate = FinishDate;
+        }
     }
 }

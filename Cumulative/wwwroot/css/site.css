@@ -5,18 +5,25 @@
     box-sizing: border-box;
 }
 
+/* Make sure the page takes full height for sticky footer */
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Body Styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f44336; /* changed to red */
+    background-color: #f44336; /* red background */
     color: #333;
     line-height: 1.6;
 }
 
 /* Header Styles */
 header {
-    background: #ffeb3b; /* changed to yellow */
-    color: #333; /* changed text color to dark for better contrast */
+    background: #ffeb3b; /* yellow */
+    color: #333; /* dark text for contrast */
     padding: 1rem;
     text-align: center;
 }
@@ -58,6 +65,7 @@ main {
     max-width: 1200px;
     margin: 20px auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1; /* This makes the main content stretch to fill space */
 }
 
     main h2 {
@@ -67,18 +75,16 @@ main {
 
 /* Footer Styles */
 footer {
-    background: #ffeb3b; /* changed to yellow */
-    color: #333; /* changed text color to dark for better contrast */
+    background: #ffeb3b; /* yellow */
+    color: #333; /* dark text */
     text-align: center;
     padding: 1rem;
-    position: relative;
-    bottom: 0;
     width: 100%;
+    font-size: 1rem;
 }
 
     footer p {
         margin: 0;
-        font-size: 1rem;
     }
 
 /* Button Styles */

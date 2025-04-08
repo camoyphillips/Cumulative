@@ -1,0 +1,106 @@
+﻿@model List<Cumulative.Models.Teacher>
+@{
+    ViewData["Title"] = "Teacher List (AJAX)";
+}
+
+<h2>Teacher List (AJAX)</h2>
+
+<div>
+    <h4>Add New Teacher</h4>
+    <form id="addTeacherForm">
+        <input type="text" name="teacherfname" placeholder="First Name" required />
+        <input type="text" name="teacherlname" placeholder="Last Name" required />
+        <input type="text" name="employeenumber" placeholder="Employee Number" required />
+        <input type="date" name="hiredate" required />
+        <input type="number" step="0.01" name="salary" placeholder="Salary" />
+        <input type="text" name="teacherworkphone" placeholder="Work Phone" />
+        <button type="submit">Add Teacher</button>
+    </form>
+</div>
+
+<br />
+
+<div>
+    <h4>Teacher List</h4>
+    <table id="teacherTable" border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First</th>
+                <th>Last</th>
+                <th>Employee #</th>
+                <th>Hire Date</th>
+                <th>Salary</th>
+                <th>Work Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var teacher in Model)
+            {
+                <tr data-id="@teacher.teacherid">
+                    <td>@teacher.teacherid</td>
+                    <td>@teacher.teacherfname</td>
+                    <td>@teacher.teacherlname</td>
+                    <td>@teacher.employeenumber</td>
+                    <td>@(teacher.hiredate?.ToShortDateString() ?? "N/A")</td>
+                    <td>@teacher.salary</td>
+                    <td>@teacher.teacherworkphone</td>
+                    <td>
+                        <button class="delete-btn" data-id="@teacher.teacherid">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        // Add Teacher via AJAX
+        document.getElementById("addTeacherForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const teacher = {};
+            formData.forEach((value, key) => teacher[key] = value);
+
+            fetch('/TeacherAjaxPage/AddTeacher', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(teacher)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Teacher added!");
+                    location.reload();
+                } else {
+                    alert("Failed: " + data.message);
+                }
+            });
+        });
+
+        // Delete Teacher via AJAX
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const id = this.getAttribute("data-id");
+
+                if (!confirm("Delete this teacher?")) return;
+
+                fetch(`/TeacherAjaxPage/DeleteTeacher?id=${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Teacher deleted!");
+                        location.reload();
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                });
+            });
+        });
+    </script>
+}

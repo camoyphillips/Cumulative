@@ -26,15 +26,15 @@
         @foreach (var course in Model)
         {
             <tr>
-                <td>@course.CourseID</td>
-                <td>@course.CourseCode</td>
-                <td>@course.CourseName</td>
-                <td>@course.StartDate.ToString("yyyy-MM-dd")</td>
-                <td>@course.FinishDate.ToString("yyyy-MM-dd")</td>
+                <td>@course.courseid</td>
+                <td>@course.coursecode</td>
+                <td>@course.coursename</td>
+                <td>@course.startdate.ToString("yyyy-MM-dd")</td>
+                <td>@course.finishdate.ToString("yyyy-MM-dd")</td>
                 <td>
-                    <a href="@Url.Action("Details", "CoursePage", new { id = course.CourseID })">Details</a> |
-                    <a href="@Url.Action("Edit", "CoursePage", new { id = course.CourseID })">Edit</a> |
-                    <a href="@Url.Action("Delete", "CoursePage", new { id = course.CourseID })">Delete</a>
+                    <a href="@Url.Action("Details", "CoursePage", new { id = course.courseid })">Details</a> |
+                    <a href="@Url.Action("Edit", "CoursePage", new { id = course.courseid })">Edit</a> |
+                    <a href="@Url.Action("Delete", "CoursePage", new { id = course.courseid })">Delete</a>
                 </td>
             </tr>
         }

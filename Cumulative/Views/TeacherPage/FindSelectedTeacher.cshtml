@@ -1,0 +1,27 @@
+﻿@model Cumulative.Models.Teacher
+
+<h1>Teacher Details</h1>
+
+<div>
+    <strong>Teacher ID:</strong> @Model.teacherid
+</div>
+<div>
+    <strong>First Name:</strong> @Model.teacherfname
+</div>
+<div>
+    <strong>Last Name:</strong> @Model.teacherlname
+</div>
+<div>
+    <strong>Hire Date:</strong>
+    @if (Model.hiredate.HasValue)
+    {
+        @Model.hiredate.Value.ToString("MM/dd/yyyy")
+    }
+    else
+    {
+        <span>No hire date available</span>
+    }
+</div>
+<div>
+    <strong>Salary:</strong> @Model.salary
+</div>

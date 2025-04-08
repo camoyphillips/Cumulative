@@ -9,10 +9,11 @@
 
 <!-- Search Bar Section -->
 <div class="text-center mt-4">
-    <form asp-controller="Home" asp-action="Search" method="get" class="form-inline justify-content-center">
+    <!-- Redirects to Swagger UI when the search form is submitted -->
+    <form method="get" onsubmit="window.location.href='/swagger'; return false;" class="form-inline justify-content-center">
         <div class="form-group mb-2">
-            <input type="text" name="query" class="form-control" placeholder="Search..." />
+            <input type="text" name="index" class="form-control" placeholder="Search (goes to Swagger UI)..." />
         </div>
-        <button type="submit" class="btn btn-primary mb-2 ml-2">Search</button>
+        <button type="submit" class="btn btn-primary mb-2 ml-2">SearchAPI</button>
     </form>
 </div>

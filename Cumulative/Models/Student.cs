@@ -1,26 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cumulative.Models
 {
     public class Student
     {
-        [Key] // Primary Key
-        public int StudentID { get; set; }
+        [Key]
+        public int studentid { get; set; }
 
         [Required]
-        public string FirstName { get; set; } = string.Empty;
+        public string? studentfname { get; set; }
 
         [Required]
-        public string LastName { get; set; } = string.Empty;
+        public string? studentlname { get; set; }
 
-        public DateTime EnrollmentDate { get; set; }
+        public DateTime enroldate { get; set; }
 
-        public int StudentNumber { get; set; }
+        public string studentnumber { get; set; }
 
-        // Simplified collection initialization
-        public ICollection<Course> Courses { get; set; } = [];
+        // ✅ Navigation property for many-to-many
+        public ICollection<StudentCourse> StudentCourses { get; set; } = new List<StudentCourse>();
+
+        public Student() { }
+
+        public Student(int StudentID, string FirstName, string LastName, DateTime EnrolDate, string StudentNumber)
+        {
+            studentid = StudentID;
+            studentfname = FirstName;
+            studentlname = LastName;
+            enroldate = EnrolDate;
+            studentnumber = StudentNumber;
+        }
     }
 }

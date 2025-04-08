@@ -1,0 +1,49 @@
+﻿@model Cumulative.Models.Teacher
+
+<h2>Create New Teacher</h2>
+<script>
+
+    function ValidateTeacher()
+    {
+        var teacherfname = document.getElementById("teacherfname");
+        if (teacherfname == ""  || teacherfname == null){
+            document.getElementById("NameError").innerHTML = "Include a Name";
+            return false
+        }
+        return true;
+
+    }
+
+
+
+</script>
+
+<form asp-action="TeacherPage/New" method="post">
+    <div class="form-group">
+        <label for="teacherfname">First Name</label>
+        <input asp-for="teacherfname" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="teacherlname">Last Name</label>
+        <input asp-for="teacherlname" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="employeenumber">Employee Number</label>
+        <input asp-for="employeenumber" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="hiredate">Hire Date</label>
+        <input asp-for="hiredate" type="date" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="salary">Salary</label>
+        <input asp-for="salary" type="number" step="0.01" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Create</button>
+    <a class="btn btn-secondary mt-3" asp-action="ListTeachers">Cancel</a>
+</form>

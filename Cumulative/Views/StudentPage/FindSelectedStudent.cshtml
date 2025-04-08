@@ -1,0 +1,27 @@
+﻿@model Cumulative.Models.Student
+
+<h1>Student Details</h1>
+
+<div>
+    <strong>Student ID:</strong> @Model.studentid // Corrected to StudentID
+</div>
+<div>
+    <strong>First Name:</strong> @Model.studentfname
+</div>
+<div>
+    <strong>Last Name:</strong> @Model.studentlname
+</div>
+<div>
+    <strong>Student Number:</strong> @Model.studentnumber
+</div>
+<div>
+    <strong>Enrollment Date:</strong>
+    @if (Model.enroldate != DateTime.MinValue)
+    {
+        @Model.enroldate.ToString("MM/dd/yyyy")
+    }
+    else
+    {
+        <span>No enrollment date available</span>
+    }
+</div>

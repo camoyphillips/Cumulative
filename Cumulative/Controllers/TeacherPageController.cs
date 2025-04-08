@@ -1,38 +1,84 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Cumulative.Models;
 using System.Linq;
-using System; // Required for StringComparison
+using System;
+using System.Collections.Generic;
 
 namespace Cumulative.Controllers
 {
-    public class TeacherPageController(SchoolDbContext context) : Controller
+    public class TeacherPageController : Controller
     {
-        private readonly SchoolDbContext _context = context;
+        private readonly SchoolDbContext _context;
 
-        // GET: Teacher/List?{SearchKey}
-        public IActionResult List(string SearchKey)
+        public TeacherPageController(SchoolDbContext context)
         {
-            var teachers = string.IsNullOrEmpty(SearchKey)
-                ? _context.Teachers.ToList()
-                : _context.Teachers
-                    .Where(teacher =>
-                        teacher.FirstName.Contains(SearchKey, StringComparison.OrdinalIgnoreCase) ||
-                        teacher.LastName.Contains(SearchKey, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-            return View(teachers);
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // GET: Teacher/Show/5
-        public IActionResult Show(int id)
+        // GET: TeacherPage/ListTeachers
+        [HttpGet]
+        public IActionResult ListTeachers(string SearchKey)
         {
-            var teacher = _context.Teachers.FirstOrDefault(t => t.TeacherID == id);
-            if (teacher == null)
+            ViewBag.SearchKey = SearchKey;
+
+            List<Teacher> ListTeachers = string.IsNullOrWhiteSpace(SearchKey)
+                ? _context.Teachers.ToList()
+                : _context.Teachers
+                    .Where(t =>
+                        (t.teacherfname != null && t.teacherfname.Contains(SearchKey, StringComparison.OrdinalIgnoreCase)) ||
+                        (t.teacherlname != null && t.teacherlname.Contains(SearchKey, StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+
+            return View(ListTeachers);
+        }
+
+        // GET: TeacherPage/FindSelectedTeacher/5
+        [HttpGet]
+        public IActionResult FindSelectedTeacher(int id)
+        {
+            var FindSelectedTeacher = _context.Teachers.FirstOrDefault(t => t.teacherid == id);
+            return FindSelectedTeacher == null ? NotFound() : View(FindSelectedTeacher);
+        }
+
+
+        // POST: TeacherPage/Create
+        [HttpPost]
+
+        public IActionResult New(Teacher newTeacher)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Teachers.Add(newTeacher);
+                _context.SaveChanges();
+
+                return RedirectToAction("ListTeachers", new { id = newTeacher.teacherid });
+            }
+
+            return View(New);
+        }
+
+        // GET: TeacherPage/DeleteConfirm/5
+        [HttpGet]
+        public IActionResult DeleteConfirm(int id)
+        {
+            var FindSelectedTeacher = _context.Teachers.FirstOrDefault(t => t.teacherid == id);
+            return FindSelectedTeacher == null ? NotFound() : View(FindSelectedTeacher);
+        }
+
+        // POST: TeacherPage/Delete/5
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            var TeacherToDelete = _context.Teachers.FirstOrDefault(t => t.teacherid == id);
+            if (TeacherToDelete == null)
             {
                 return NotFound();
             }
 
-            return View(teacher);
+            _context.Teachers.Remove(TeacherToDelete);
+            _context.SaveChanges();
+
+            return RedirectToAction("ListTeachers");
         }
     }
 }

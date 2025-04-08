@@ -1,0 +1,16 @@
+﻿@model Cumulative.Models.Teacher
+
+<h2>Are you sure you want to delete this teacher?</h2>
+
+<div class="alert alert-warning">
+    <strong>@Model.teacherfname @Model.teacherlname</strong><br />
+    Employee #: @Model.employeenumber<br />
+    Hire Date: @Model.hiredate?.ToString("yyyy-MM-dd")<br />
+    Salary: @Model.salary.ToString("C")
+</div>
+
+<form asp-action="DeleteConfirm" method="post">
+    <input type="hidden" name="id" value="@Model.teacherid" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-secondary" asp-action="List">Cancel</a>
+</form>

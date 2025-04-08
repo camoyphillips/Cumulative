@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Cumulative.Models;
 using System;
 using System.Collections.Generic;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cumulative.Controllers
 {
-    [Route("api/Student")]
+    [Route("StudentAPI")]
     [ApiController]
     public class StudentAPIController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace Cumulative.Controllers
         /// Returns a list of Students in the system
         /// </summary>
         /// <example>
-        /// GET api/Student/ListStudents -> [{"StudentID":1,"FirstName":"John", "LastName":"Doe", "EnrollmentDate":"2023-01-15", "StudentNumber":1001},...]
+        /// GET api/Student/ListStudents -> [{"StudentID":1,"FirstName":"John", "LastName":"Doe", "EnrollmentDate":"2023-01-15", "StudentNumber":"1001"},...]
         /// </example>
         /// <returns>
         /// A list of student objects
@@ -37,28 +37,30 @@ namespace Cumulative.Controllers
             using (MySqlConnection Connection = (MySqlConnection)_context.Database.GetDbConnection())
             {
                 Connection.Open();
-                MySqlCommand Command = Connection.CreateCommand();
-                Command.CommandText = "SELECT * FROM students";
-
-                using (MySqlDataReader ResultSet = Command.ExecuteReader())
+                using (MySqlCommand Command = Connection.CreateCommand())
                 {
-                    while (ResultSet.Read())
-                    {
-                        int Id = Convert.ToInt32(ResultSet["studentid"]);
-                        string FirstName = ResultSet["studentfname"].ToString();
-                        string LastName = ResultSet["studentlname"].ToString();
-                        DateTime EnrollmentDate = Convert.ToDateTime(ResultSet["enroldate"]);
-                        int StudentNumber = Convert.ToInt32(ResultSet["studentnumber"]);
+                    Command.CommandText = "SELECT * FROM students";
 
-                        Student CurrentStudent = new Student
+                    using (MySqlDataReader ResultSet = Command.ExecuteReader())
+                    {
+                        while (ResultSet.Read())
                         {
-                            StudentID = Id,
-                            FirstName = FirstName,
-                            LastName = LastName,
-                            EnrollmentDate = EnrollmentDate,
-                            StudentNumber = StudentNumber
-                        };
-                        Students.Add(CurrentStudent);
+                            int Id = Convert.ToInt32(ResultSet["studentid"]);
+                            string FirstName = ResultSet["studentfname"].ToString();
+                            string LastName = ResultSet["studentlname"].ToString();
+                            DateTime EnrollmentDate = Convert.ToDateTime(ResultSet["enroldate"]);
+                            string StudentNumber = ResultSet["studentnumber"].ToString(); // Corrected here
+
+                            Student CurrentStudent = new Student
+                            {
+                                studentid = Id,
+                                studentfname = FirstName,
+                                studentlname = LastName,
+                                enroldate = EnrollmentDate,
+                                studentnumber = StudentNumber // Corrected here
+                            };
+                            Students.Add(CurrentStudent);
+                        }
                     }
                 }
             }
@@ -70,7 +72,7 @@ namespace Cumulative.Controllers
         /// Returns a Student in the database by their ID
         /// </summary>
         /// <example>
-        /// GET api/Student/FindStudent/3 -> {"StudentID":3,"FirstName":"Jane","LastName":"Smith","EnrollmentDate":"2020-06-10","StudentNumber":2001}
+        /// GET api/Student/FindStudent/3 -> {"StudentID":3,"FirstName":"Jane","LastName":"Smith","EnrollmentDate":"2020-06-10","StudentNumber":"2001"}
         /// </example>
         /// <returns>
         /// A matching student object by its ID. Empty object if Student not found
@@ -79,38 +81,77 @@ namespace Cumulative.Controllers
         [Route("FindStudent/{id}")]
         public Student FindStudent(int id)
         {
-            Student SelectedStudent = null;
+            Student? SelectedStudent = null;
 
             using (MySqlConnection Connection = (MySqlConnection)_context.Database.GetDbConnection())
             {
                 Connection.Open();
-                MySqlCommand Command = Connection.CreateCommand();
-                Command.CommandText = "SELECT * FROM students WHERE StudentID=@id";
-                Command.Parameters.AddWithValue("@id", id);
-
-                using (MySqlDataReader ResultSet = Command.ExecuteReader())
+                using (MySqlCommand Command = Connection.CreateCommand())
                 {
-                    if (ResultSet.Read())
-                    {
-                        int Id = Convert.ToInt32(ResultSet["studentid"]);
-                        string FirstName = ResultSet["studentfname"].ToString();
-                        string LastName = ResultSet["studentlname"].ToString();
-                        DateTime EnrollmentDate = Convert.ToDateTime(ResultSet["enroldate"]);
-                        int StudentNumber = Convert.ToInt32(ResultSet["studentnumber"]);
+                    Command.CommandText = "SELECT * FROM students WHERE StudentID=@id";
+                    Command.Parameters.AddWithValue("@id", id);
 
-                        SelectedStudent = new Student
+                    using (MySqlDataReader ResultSet = Command.ExecuteReader())
+                    {
+                        if (ResultSet.Read())
                         {
-                            StudentID = Id,
-                            FirstName = FirstName,
-                            LastName = LastName,
-                            EnrollmentDate = EnrollmentDate,
-                            StudentNumber = StudentNumber
-                        };
+                            int Id = Convert.ToInt32(ResultSet["studentid"]);
+                            string FirstName = ResultSet["studentfname"].ToString();
+                            string LastName = ResultSet["studentlname"].ToString();
+                            DateTime EnrollmentDate = Convert.ToDateTime(ResultSet["enroldate"]);
+                            string StudentNumber = ResultSet["studentnumber"].ToString(); // Corrected here
+
+                            SelectedStudent = new Student
+                            {
+                                studentid = Id,
+                                studentfname = FirstName,
+                                studentlname = LastName,
+                                enroldate = EnrollmentDate,
+                                studentnumber = StudentNumber // Corrected here
+                            };
+                        }
                     }
                 }
             }
 
             return SelectedStudent;
+        }
+
+        /// <summary>
+        /// Adds a new student to the system.
+        /// </summary>
+        [HttpPost]
+        [Route("AddStudent")]
+        public async Task<IActionResult> AddStudent([FromBody] Student student)
+        {
+            if (student == null)
+            {
+                return BadRequest("Invalid student data.");
+            }
+
+            await _context.Students.AddAsync(student);
+            await _context.SaveChangesAsync();
+
+            return Ok("Student added successfully!");
+        }
+
+        /// <summary>
+        /// Deletes a student by ID from the system.
+        /// </summary>
+        [HttpDelete]
+        [Route("DeleteStudent/{id}")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound($"Student with ID {id} not found.");
+            }
+
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Student with ID {id} deleted successfully.");
         }
     }
 }

@@ -1,0 +1,37 @@
+﻿@model Cumulative.Models.Course
+
+<h1>Course Details</h1>
+
+<div>
+    <strong>Course ID:</strong> @Model.courseid
+</div>
+<div>
+    <strong>Course Name:</strong> @Model.coursename
+</div>
+<div>
+    <strong>Course Code:</strong> @Model.coursecode
+</div>
+<div>
+    <strong>Teacher ID:</strong> @Model.teacherid
+</div>
+<div>
+    <strong>Start Date:</strong> @Model.startdate.ToString("MM/dd/yyyy")
+</div>
+<div>
+    <strong>Finish Date:</strong> @Model.finishdate.ToString("MM/dd/yyyy")
+</div>
+
+<h2>Assigned Teachers</h2>
+@if (Model.StudentCourses != null && Model.StudentCourses.Any())
+{
+    <ul>
+        @foreach (var StudentCourse in Model.StudentCourses)
+        {
+            <li>@StudentCourse.student.studentfname @StudentCourse.student.studentlname</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No teachers assigned to this course.</p>
+}

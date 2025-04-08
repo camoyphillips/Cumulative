@@ -17,26 +17,29 @@ namespace Cumulative.Controllers
         }
 
         // GET: CoursePageController
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var courses = await _context.Courses.ToListAsync();
-            return View(courses);
+            var Courses = await _context.Courses.ToListAsync();
+            return View(Courses);
         }
 
         // GET: CoursePageController/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int courseID)
         {
-            var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseID == courseID);
+            var SelectedCourse = await _context.Courses.FirstOrDefaultAsync(c => c.courseid == courseID);
 
-            if (course == null)
+            if (SelectedCourse == null)
             {
                 return NotFound();
             }
 
-            return View(course);
+            return View(SelectedCourse);
         }
 
         // GET: CoursePageController/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -57,6 +60,7 @@ namespace Cumulative.Controllers
         }
 
         // GET: CoursePageController/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int courseID)
         {
             var course = await _context.Courses.FindAsync(courseID);
@@ -72,7 +76,7 @@ namespace Cumulative.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int courseID, [Bind("CourseID, CourseName, CourseCode, TeacherID, StartDate, FinishDate")] Course course)
         {
-            if (courseID != course.CourseID)
+            if (courseID != course.courseid)
             {
                 return NotFound();
             }
@@ -86,7 +90,7 @@ namespace Cumulative.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CourseExists(course.CourseID))
+                    if (!CourseExists(course.courseid))
                     {
                         return NotFound();
                     }
@@ -103,7 +107,7 @@ namespace Cumulative.Controllers
         // GET: CoursePageController/Delete/5
         public async Task<IActionResult> Delete(int courseID)
         {
-            var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseID == courseID);
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.courseid == courseID);
 
             if (course == null)
             {
@@ -130,7 +134,7 @@ namespace Cumulative.Controllers
 
         private bool CourseExists(int courseID)
         {
-            return _context.Courses.Any(e => e.CourseID == courseID);
+            return _context.Courses.Any(e => e.courseid == courseID);
         }
     }
 }
