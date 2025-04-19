@@ -1,27 +1,39 @@
-﻿@model Cumulative.Models.Teacher
+﻿@* Cumulative/Views/TeacherPage/FindSelectedTeacher.cshtml *@
+@model Cumulative.Models.Teacher
 
-<h1>Teacher Details</h1>
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
 
 <div>
-    <strong>Teacher ID:</strong> @Model.teacherid
+    <dl class="row">
+        @* Using definition list for better structure *@
+        <dt class="col-sm-3">Teacher ID</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.teacherid)</dd>
+
+        <dt class="col-sm-3">First Name</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.teacherfname)</dd>
+
+        <dt class="col-sm-3">Last Name</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.teacherlname)</dd>
+
+        <dt class="col-sm-3">Employee Number</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.employeenumber)</dd>
+
+        <dt class="col-sm-3">Hire Date</dt>
+        <dd class="col-sm-9">@Model.hiredate?.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-3">Salary</dt>
+        <dd class="col-sm-9">@Model.salary.ToString("C")</dd>
+
+        <dt class="col-sm-3">Work Phone</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.teacherworkphone)</dd> 
+    </dl>
 </div>
 <div>
-    <strong>First Name:</strong> @Model.teacherfname
-</div>
-<div>
-    <strong>Last Name:</strong> @Model.teacherlname
-</div>
-<div>
-    <strong>Hire Date:</strong>
-    @if (Model.hiredate.HasValue)
-    {
-        @Model.hiredate.Value.ToString("MM/dd/yyyy")
-    }
-    else
-    {
-        <span>No hire date available</span>
-    }
-</div>
-<div>
-    <strong>Salary:</strong> @Model.salary
+    <a asp-action="Edit" asp-route-id="@Model.teacherid" class="btn btn-primary">Edit</a> |
+    <a asp-action="ListTeachers" class="btn btn-secondary">Back to List</a>
 </div>

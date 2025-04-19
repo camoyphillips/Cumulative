@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using MySqlConnector;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Cumulative.Controllers
 {
@@ -16,18 +17,9 @@ namespace Cumulative.Controllers
 
         public StudentAPIController(SchoolDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        /// <summary>
-        /// Returns a list of Students in the system
-        /// </summary>
-        /// <example>
-        /// GET api/Student/ListStudents -> [{"StudentID":1,"FirstName":"John", "LastName":"Doe", "EnrollmentDate":"2023-01-15", "StudentNumber":"1001"},...]
-        /// </example>
-        /// <returns>
-        /// A list of student objects
-        /// </returns>
         [HttpGet]
         [Route("ListStudents")]
         public List<Student> ListStudents()
@@ -49,7 +41,7 @@ namespace Cumulative.Controllers
                             string FirstName = ResultSet["studentfname"].ToString();
                             string LastName = ResultSet["studentlname"].ToString();
                             DateTime EnrollmentDate = Convert.ToDateTime(ResultSet["enroldate"]);
-                            string StudentNumber = ResultSet["studentnumber"].ToString(); // Corrected here
+                            string StudentNumber = ResultSet["studentnumber"].ToString();
 
                             Student CurrentStudent = new Student
                             {
@@ -57,7 +49,7 @@ namespace Cumulative.Controllers
                                 studentfname = FirstName,
                                 studentlname = LastName,
                                 enroldate = EnrollmentDate,
-                                studentnumber = StudentNumber // Corrected here
+                                studentnumber = StudentNumber
                             };
                             Students.Add(CurrentStudent);
                         }
@@ -68,15 +60,6 @@ namespace Cumulative.Controllers
             return Students;
         }
 
-        /// <summary>
-        /// Returns a Student in the database by their ID
-        /// </summary>
-        /// <example>
-        /// GET api/Student/FindStudent/3 -> {"StudentID":3,"FirstName":"Jane","LastName":"Smith","EnrollmentDate":"2020-06-10","StudentNumber":"2001"}
-        /// </example>
-        /// <returns>
-        /// A matching student object by its ID. Empty object if Student not found
-        /// </returns>
         [HttpGet]
         [Route("FindStudent/{id}")]
         public Student FindStudent(int id)
@@ -88,7 +71,7 @@ namespace Cumulative.Controllers
                 Connection.Open();
                 using (MySqlCommand Command = Connection.CreateCommand())
                 {
-                    Command.CommandText = "SELECT * FROM students WHERE StudentID=@id";
+                    Command.CommandText = "SELECT * FROM students WHERE studentid=@id";
                     Command.Parameters.AddWithValue("@id", id);
 
                     using (MySqlDataReader ResultSet = Command.ExecuteReader())
@@ -99,7 +82,7 @@ namespace Cumulative.Controllers
                             string FirstName = ResultSet["studentfname"].ToString();
                             string LastName = ResultSet["studentlname"].ToString();
                             DateTime EnrollmentDate = Convert.ToDateTime(ResultSet["enroldate"]);
-                            string StudentNumber = ResultSet["studentnumber"].ToString(); // Corrected here
+                            string StudentNumber = ResultSet["studentnumber"].ToString();
 
                             SelectedStudent = new Student
                             {
@@ -107,19 +90,16 @@ namespace Cumulative.Controllers
                                 studentfname = FirstName,
                                 studentlname = LastName,
                                 enroldate = EnrollmentDate,
-                                studentnumber = StudentNumber // Corrected here
+                                studentnumber = StudentNumber
                             };
                         }
                     }
                 }
             }
 
-            return SelectedStudent;
+            return SelectedStudent ?? new Student();
         }
 
-        /// <summary>
-        /// Adds a new student to the system.
-        /// </summary>
         [HttpPost]
         [Route("AddStudent")]
         public async Task<IActionResult> AddStudent([FromBody] Student student)
@@ -132,12 +112,35 @@ namespace Cumulative.Controllers
             await _context.Students.AddAsync(student);
             await _context.SaveChangesAsync();
 
-            return Ok("Student added successfully!");
+            return Ok("Student added successfully.");
         }
 
-        /// <summary>
-        /// Deletes a student by ID from the system.
-        /// </summary>
+        [HttpPut]
+        [Route("UpdateStudent/{id}")]
+        public async Task<IActionResult> UpdateStudent(int id, [FromBody] Student updatedStudent)
+        {
+            if (updatedStudent == null || id != updatedStudent.studentid)
+            {
+                return BadRequest("Invalid student data.");
+            }
+
+            var existingStudent = await _context.Students.FindAsync(id);
+            if (existingStudent == null)
+            {
+                return NotFound($"Student with ID {id} not found.");
+            }
+
+            existingStudent.studentfname = updatedStudent.studentfname;
+            existingStudent.studentlname = updatedStudent.studentlname;
+            existingStudent.enroldate = updatedStudent.enroldate;
+            existingStudent.studentnumber = updatedStudent.studentnumber;
+
+            _context.Students.Update(existingStudent);
+            await _context.SaveChangesAsync();
+
+            return Ok("Student updated successfully.");
+        }
+
         [HttpDelete]
         [Route("DeleteStudent/{id}")]
         public async Task<IActionResult> DeleteStudent(int id)

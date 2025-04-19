@@ -40,10 +40,16 @@ namespace Cumulative.Controllers
             return FindSelectedTeacher == null ? NotFound() : View(FindSelectedTeacher);
         }
 
+        // GET: TeacherPage/New
+        [HttpGet]
+        public IActionResult New()
+        {
+            return View();
+        }
 
-        // POST: TeacherPage/Create
+        // POST: TeacherPage/New
         [HttpPost]
-
+        [ValidateAntiForgeryToken]
         public IActionResult New(Teacher newTeacher)
         {
             if (ModelState.IsValid)
@@ -51,10 +57,45 @@ namespace Cumulative.Controllers
                 _context.Teachers.Add(newTeacher);
                 _context.SaveChanges();
 
-                return RedirectToAction("ListTeachers", new { id = newTeacher.teacherid });
+                return RedirectToAction("FindSelectedTeacher", new { id = newTeacher.teacherid });
             }
 
-            return View(New);
+            return View(newTeacher);
+        }
+
+        // GET: TeacherPage/Edit/5
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var teacherToEdit = _context.Teachers.FirstOrDefault(t => t.teacherid == id);
+            return teacherToEdit == null ? NotFound() : View(teacherToEdit);
+        }
+
+        // POST: TeacherPage/Update/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Update(int id, Teacher updatedTeacher)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Edit", updatedTeacher);
+            }
+
+            var existingTeacher = _context.Teachers.FirstOrDefault(t => t.teacherid == id);
+            if (existingTeacher == null)
+            {
+                return NotFound();
+            }
+
+            existingTeacher.teacherfname = updatedTeacher.teacherfname;
+            existingTeacher.teacherlname = updatedTeacher.teacherlname;
+            existingTeacher.employeenumber = updatedTeacher.employeenumber;
+            existingTeacher.hiredate = updatedTeacher.hiredate;
+            existingTeacher.salary = updatedTeacher.salary;
+
+            _context.SaveChanges();
+
+            return RedirectToAction("FindSelectedTeacher", new { id = existingTeacher.teacherid });
         }
 
         // GET: TeacherPage/DeleteConfirm/5
@@ -67,6 +108,7 @@ namespace Cumulative.Controllers
 
         // POST: TeacherPage/Delete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var TeacherToDelete = _context.Teachers.FirstOrDefault(t => t.teacherid == id);

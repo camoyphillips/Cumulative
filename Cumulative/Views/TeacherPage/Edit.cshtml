@@ -1,45 +1,48 @@
-﻿@* Cumulative/Views/TeacherPage/New.cshtml *@
+﻿@* Cumulative/Views/TeacherPage/Edit.cshtml *@
 @model Cumulative.Models.Teacher
 
 @{
-    ViewData["Title"] = "Create New Teacher";
+    ViewData["Title"] = "Edit Teacher";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>@ViewData["Title"] - @Model.teacherfname @Model.teacherlname</h2>
 <hr />
 
 @* Display overall validation summary *@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-@* Note: The form now submits to TeacherPage/New via POST *@
-<form asp-action="New" asp-controller="TeacherPage" method="post" onsubmit="return ValidateTeacherForm();">
+@* Form posts to the Update action for the specific teacher ID *@
+<form asp-action="Update" asp-controller="TeacherPage" asp-route-id="@Model.teacherid" method="post" onsubmit="return ValidateTeacherForm();">
     @Html.AntiForgeryToken() @* Add CSRF token *@
 
+    @* Include teacherid as a hidden field if needed by model binding/validation, though route provides it *@
+    <input type="hidden" asp-for="teacherid" />
+
     <div class="form-group mb-3">
-        @* Added margin bottom *@
         <label asp-for="teacherfname" class="control-label"></label>
         <input asp-for="teacherfname" class="form-control" />
         <span asp-validation-for="teacherfname" class="text-danger"></span>
-        <span id="fnameError" class="text-danger client-validation-error"></span> @* Placeholder for client JS error *@
+        <span id="teacherfnameError" class="text-danger client-validation-error"></span>
     </div>
 
     <div class="form-group mb-3">
         <label asp-for="teacherlname" class="control-label"></label>
         <input asp-for="teacherlname" class="form-control" />
         <span asp-validation-for="teacherlname" class="text-danger"></span>
-        <span id="lnameError" class="text-danger client-validation-error"></span>
+        <span id="teacherlnameError" class="text-danger client-validation-error"></span>
     </div>
 
     <div class="form-group mb-3">
         <label asp-for="employeenumber" class="control-label"></label>
-        <input asp-for="employeenumber" class="form-control" placeholder="e.g., T123" />
+        <input asp-for="employeenumber" class="form-control" />
         <span asp-validation-for="employeenumber" class="text-danger"></span>
-        <span id="empNumError" class="text-danger client-validation-error"></span>
+        <span id="employeenumberError" class="text-danger client-validation-error"></span>
     </div>
 
     <div class="form-group mb-3">
         <label asp-for="hiredate" class="control-label"></label>
-        <input asp-for="hiredate" type="date" class="form-control" />
+        @* Format date for input type="date" value attribute *@
+        <input asp-for="hiredate" type="date" class="form-control" value="@Model.hiredate?.ToString("yyyy-MM-dd")" />
         <span asp-validation-for="hiredate" class="text-danger"></span>
         <span id="hireDateError" class="text-danger client-validation-error"></span>
     </div>
@@ -52,25 +55,26 @@
     </div>
 
     <div class="form-group mb-3">
-        @* Added Work Phone *@
         <label asp-for="teacherworkphone" class="control-label">Work Phone (Optional)</label>
         <input asp-for="teacherworkphone" class="form-control" />
         <span asp-validation-for="teacherworkphone" class="text-danger"></span>
-        @* No client validation needed if optional, unless specific format required *@
     </div>
 
     <div class="form-group">
-        <button type="submit" class="btn btn-success">Create</button>
-        <a class="btn btn-secondary" asp-action="ListTeachers">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a class="btn btn-secondary" asp-action="FindSelectedTeacher" asp-route-id="@Model.teacherid">Cancel</a>
+        <a class="btn btn-outline-secondary" asp-action="ListTeachers">Back to List</a> 
+
     </div>
 </form>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    } @* Include standard validation scripts *@
+    }
 
     <script>
+        // Use the *exact same* validation function as New.cshtml
         function ValidateTeacherForm() {
             let isValid = true;
             // Clear previous errors
@@ -79,62 +83,57 @@
             // First Name Validation
             const fname = document.getElementById("teacherfname").value.trim();
             if (fname === "") {
-                document.getElementById("teacherfnameError").innerHTML = "First name is required.";
+                document.getElementById("teacherfnameError").innerHTML = "First name is required."; // Initiative: Client Error Handling empty name
                 isValid = false;
             }
 
             // Last Name Validation
             const lname = document.getElementById("teacherlname").value.trim();
              if (lname === "") {
-                 document.getElementById("teacherlnameError").innerHTML = "Last name is required.";
+                 document.getElementById("teacherlnameError").innerHTML = "Last name is required."; // Initiative: Client Error Handling empty name
                  isValid = false;
              }
 
-             // Employee Number Basic Format (Doesn't check uniqueness - server does that)
+             // Employee Number Basic Format
              const empNum = document.getElementById("employeenumber").value.trim();
              const empNumRegex = /^T\d+$/;
-             if (empNum === "") {
-                 document.getElementById("employeenumberError").innerHTML = "Employee number is required.";
-                 isValid = false;
-             } else if (!empNumRegex.test(empNum)) {
+              if (empNum === "") {
+                  document.getElementById("employeenumberError").innerHTML = "Employee number is required.";
+                  isValid = false;
+              } else if (!empNumRegex.test(empNum)) {
                   document.getElementById("employeenumberError").innerHTML = "Employee number must start with 'T' followed by digits (e.g., T123).";
                   isValid = false;
-             }
-
+              }
 
             // Hire Date Validation (Not in future)
             const hireDateInput = document.getElementById("hiredate");
-            if (hireDateInput.value) { // Only validate if a date is entered
+             if (hireDateInput.value) {
                  const hireDate = new Date(hireDateInput.value);
-                 // Adjust today's date to midnight UTC to compare dates correctly regardless of time zone
                  const today = new Date();
                  today.setUTCHours(0, 0, 0, 0);
-                 // Adjust hireDate to UTC midnight for comparison
                  const hireDateUTC = new Date(Date.UTC(hireDate.getFullYear(), hireDate.getMonth(), hireDate.getDate()));
 
                  if (hireDateUTC > today) {
-                    document.getElementById("hiredateError").innerHTML = "Hire date cannot be in the future.";
+                    document.getElementById("hireDateError").innerHTML = "Hire date cannot be in the future."; // Initiative: Client Error Handling future hire date
                     isValid = false;
                  }
-            }
+             }
 
 
             // Salary Validation (Not negative)
-            const salaryInput = document.getElementById("salary");
-            if (salaryInput.value !== "") { // Only validate if a value is entered
+             const salaryInput = document.getElementById("salary");
+             if (salaryInput.value !== "") {
                  const salary = parseFloat(salaryInput.value);
                  if (isNaN(salary) || salary < 0) {
-                    document.getElementById("salaryError").innerHTML = "Salary cannot be negative.";
+                    document.getElementById("salaryError").innerHTML = "Salary cannot be negative."; // Initiative: Client Error Handling negative salary
                     isValid = false;
                  }
-            } else {
-                // Assuming salary is required, or default to 0 if allowed empty
-                 document.getElementById("salaryError").innerHTML = "Salary is required."; // Adjust if salary can be empty/null
-                 isValid = false;
-            }
+             } else {
+                  document.getElementById("salaryError").innerHTML = "Salary is required.";
+                  isValid = false;
+             }
 
-
-            return isValid; // Prevent submit if validation fails
+            return isValid;
         }
     </script>
 }

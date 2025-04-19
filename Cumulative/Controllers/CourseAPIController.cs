@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using MySqlConnector;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Cumulative.Controllers
 {
@@ -20,9 +21,6 @@ namespace Cumulative.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// Returns a list of Courses in the system
-        /// </summary>
         [HttpGet]
         [Route("ListCourses")]
         public ActionResult<List<Course>> ListCourses()
@@ -62,9 +60,6 @@ namespace Cumulative.Controllers
             }
         }
 
-        /// <summary>
-        /// Returns a Course in the database by its ID
-        /// </summary>
         [HttpGet]
         [Route("FindCourse/{id}")]
         public ActionResult<Course> FindCourse(int id)
@@ -109,9 +104,6 @@ namespace Cumulative.Controllers
             }
         }
 
-        /// <summary>
-        /// Adds a new Course to the system
-        /// </summary>
         [HttpPost]
         [Route("AddCourse")]
         public IActionResult AddCourse([FromBody] Course course)
@@ -152,14 +144,33 @@ namespace Cumulative.Controllers
             }
         }
 
-        /// <summary>
-        /// Deletes a Course from the system by ID
-        /// </summary>
-        /// <param name="id">The ID of the course to delete</param>
-        /// <returns>Status message</returns>
-        /// <example>
-        /// POST: CoursePage/DeleteCourse/3
-        /// </example>
+        [HttpPut]
+        [Route("UpdateCourse/{id}")]
+        public async Task<IActionResult> UpdateCourse(int id, [FromBody] Course updatedCourse)
+        {
+            if (updatedCourse == null || id != updatedCourse.courseid)
+            {
+                return BadRequest("Invalid course data.");
+            }
+
+            var existingCourse = await _context.Courses.FindAsync(id);
+            if (existingCourse == null)
+            {
+                return NotFound($"Course with ID {id} not found.");
+            }
+
+            existingCourse.coursecode = updatedCourse.coursecode;
+            existingCourse.coursename = updatedCourse.coursename;
+            existingCourse.teacherid = updatedCourse.teacherid;
+            existingCourse.startdate = updatedCourse.startdate;
+            existingCourse.finishdate = updatedCourse.finishdate;
+
+            _context.Courses.Update(existingCourse);
+            await _context.SaveChangesAsync();
+
+            return Ok("Course updated successfully.");
+        }
+
         [HttpDelete]
         [Route("DeleteCourse/{id}")]
         public IActionResult DeleteCourse(int id)
