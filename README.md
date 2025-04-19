@@ -1,4 +1,4 @@
-Cumulative Project – Part 3: Update Teacher Functionality
+#Cumulative Project – Part 3: Update Teacher Functionality
 Overview
 This part of the MVP adds Update capabilities to the Teachers table using ASP.NET Core Web API and MVC. It includes both an API endpoint and a form-based UI to edit teacher data.
 GitHub Repository: https://github.com/camoyphillips/Cumulative.git
